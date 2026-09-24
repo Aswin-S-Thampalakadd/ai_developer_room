@@ -35,7 +35,7 @@ const tools = {
   },
 
   get_git_status: async ({ project }) => {
-    getGitStatus(project);
+    return getGitStatus(project);
   },
 
   get_git_log: async ({ project, limit }) => {
@@ -63,7 +63,7 @@ const tools = {
   },
 
   get_system_info: async () => {
-    getSystemInfo();
+    return getSystemInfo();
   },
 
   get_system_time: async () => {
@@ -106,6 +106,7 @@ export const createServer = () => {
     socket.on("message", async (rawMessage) => {
       try {
         const request = JSON.parse(rawMessage.toString());
+
         const { id, action, arguments: args = {} } = request;
 
         if (!id) {
