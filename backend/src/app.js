@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { desktopService } from "./modules/desktop/desktop.service.js";
 
 dotenv.config();
 
@@ -13,11 +14,14 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/health", (req, res) => {
   res.json({
     success: true,
-    messaage: "API Developer room backend",
+    message: "AI Developer Room Backend",
+    desktopAgent: desktopService.connected,
   });
 });
 
 const PORT = process.env.PORT || 5000;
+
+desktopService.connect();
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
