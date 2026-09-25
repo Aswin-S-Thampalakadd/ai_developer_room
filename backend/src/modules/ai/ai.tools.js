@@ -168,4 +168,46 @@ export const aiTools = [
       },
     },
   },
+
+  {
+    type: "function",
+    function: {
+      name: "search_code",
+      description: "Search for a text pattern inside a developer project.",
+      parameters: {
+        type: "object",
+        properties: {
+          project: {
+            type: "string",
+            description: "Project name",
+          },
+          searchTerm: {
+            type: "string",
+            description:
+              "Text, function, class, variable, or error to search for",
+          },
+        },
+        required: ["project", "searchTerm"],
+      },
+    },
+  },
+
+  {
+    type: "function",
+    function: {
+      name: "analyze_project",
+      description:
+        "Analyze the structure and package configuration of a project.",
+      parameters: {
+        type: "object",
+        properties: {
+          project: {
+            type: "string",
+            description: "Project name",
+          },
+        },
+        required: ["project"],
+      },
+    },
+  },
 ];
