@@ -16,6 +16,8 @@ import {
   stopDevServer,
 } from "./tools/terminal.js";
 import { getSystemInfo, getSystemTime } from "./tools/system.js";
+import { searchCode } from "./tools/code.js";
+import { analyzeProject } from "./tools/project-analyzer.js";
 
 const tools = {
   list_projects: async () => listProjects(),
@@ -68,6 +70,14 @@ const tools = {
 
   get_system_time: async () => {
     getSystemTime();
+  },
+
+  search_code: async () => {
+    return searchCode();
+  },
+
+  analyze_project: async () => {
+    analyzeProject();
   },
 };
 

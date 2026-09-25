@@ -57,6 +57,12 @@ const executeTool = async (name, args) => {
     case "get_system_info":
       return await desktopService.call("get_system_info", {});
 
+    case "search_code":
+      return await desktopService.call("search_code", args);
+
+    case "analyze_project":
+      return await desktopService.call("analyze_project", args);
+
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
