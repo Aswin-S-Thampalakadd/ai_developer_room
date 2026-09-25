@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { spawn } from "child_process";
+import { exec, spawn } from "child_process";
 import config from "../config.js";
 
 const resolveProjectPath = (projectName) => {
@@ -54,17 +54,34 @@ export const getCurrentProject = async () => {
   };
 };
 
-export const openProject = async (projectName) => {
-  const projectPath = resolveProjectPath(projectName);
+export const openProject = async (project) => {
+  const entries = await fs.readdir(config.projectsRoot, {
+    withFileTypes: true,
+  });
+
+  const projectEntry = entries.find(
+    (entry) => entry.isDirectory() && entry.name === project
+  );
+
+  if (!projectEntry) {
+    throw new Error(
+      `Project not found: ${project}. Available projects: ${entries
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name)
+        .join(", ")}`
+    );
+  }
+
+  const projectPath = path.join(config.projectsRoot, projectEntry.name);
 
   await fs.access(projectPath);
 
-  const result = await openApplication("code", [projectPath], projectPath);
+  exec(`code "${projectPath}"`);
 
   return {
-    project: projectName,
+    success: true,
+    project: projectEntry.name,
     path: projectPath,
-    pid: result.pid,
   };
 };
 

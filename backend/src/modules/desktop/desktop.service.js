@@ -29,9 +29,12 @@ class DesktopServices {
       this.handleMessage(raw);
     });
 
+    this.socket.on("error", (error) => {
+      console.error("Desktop Agent WebSocket error:", error.message);
+    });
+
     this.socket.on("close", () => {
       this.connected = false;
-
       console.log("Desktop Agent disconnected :(");
 
       setTimeout(() => {
@@ -56,19 +59,20 @@ class DesktopServices {
 
       this.pendingRequests.delete(message.id);
 
+      clearTimeout(pending.timeout);
+
       if (!message.success) {
         pending.reject(new Error(message.error || "Desktop Agent Error"));
-
         return;
       }
 
       pending.resolve(message.result);
     } catch (error) {
-      console.error("Invalid Desktop agent message : ", error.message);
+      console.error("Invalid Desktop Agent message:", error.message);
     }
   }
 
-  execute(action, argumentsObject = {}) {
+  call(action, argumentsObject = {}) {
     return new Promise((resolve, reject) => {
       if (!this.socket || !this.connected) {
         reject(new Error("Desktop Agent is not connected"));
@@ -77,9 +81,16 @@ class DesktopServices {
 
       const id = `request-${++this.requestCounter}`;
 
+      const timeout = setTimeout(() => {
+        this.pendingRequests.delete(id);
+
+        reject(new Error(`Desktop Agent request timeout: ${action}`));
+      }, 30000);
+
       this.pendingRequests.set(id, {
         resolve,
         reject,
+        timeout,
       });
 
       this.socket.send(
@@ -89,14 +100,6 @@ class DesktopServices {
           arguments: argumentsObject,
         })
       );
-
-      setTimeout(() => {
-        if (this.pendingRequests.has(id)) {
-          this.pendingRequests.delete(id);
-        }
-
-        reject(new Error("Desktop Agent request timed out"));
-      }, 3000);
     });
   }
 }

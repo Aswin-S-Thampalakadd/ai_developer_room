@@ -47,11 +47,11 @@ const runGit = (projectPath, args) => {
 
 export const getGitStatus = async (projectName) => {
   const projectPath = resolveProjectPath(projectName);
-  console.log("00000000000", projectPath);
+
   await fs.access(projectPath);
-  console.log("11111111111111");
+
   const status = await runGit(projectPath, ["status", "--short", "--branch"]);
-  console.log("status-----------", status);
+
   return {
     project: projectName,
     status,
