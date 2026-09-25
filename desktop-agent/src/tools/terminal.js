@@ -1,4 +1,4 @@
-import fs, { chown } from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { spawn } from "child_process";
 import config from "../config.js";
@@ -88,7 +88,7 @@ export const startDevServer = async (projectName) => {
     };
   }
 
-  const child = spawn("npm", ["run", "dev"], {
+  const child = spawn("npm", ["run", "start:dev"], {
     cwd: projectPath,
     detached: true,
     stdio: ["ignore", "pipe", "pipe"],

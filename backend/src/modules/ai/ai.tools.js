@@ -4,11 +4,11 @@ export const aiTools = [
     function: {
       name: "list_projects",
       description:
-        "List development projects available on the user's computer.",
+        "List all available developer projects on the user's computer.",
       parameters: {
         type: "object",
         properties: {},
-        additionalProperties: false,
+        required: [],
       },
     },
   },
@@ -17,11 +17,11 @@ export const aiTools = [
     type: "function",
     function: {
       name: "get_current_project",
-      description: "Get the user's configured current development project.",
+      description: "Get the currently configured developer project.",
       parameters: {
         type: "object",
         properties: {},
-        additionalProperties: false,
+        required: [],
       },
     },
   },
@@ -30,17 +30,16 @@ export const aiTools = [
     type: "function",
     function: {
       name: "open_project",
-      description: "Open a development project in VS Code.",
+      description: "Open a developer project in VS Code.",
       parameters: {
         type: "object",
         properties: {
           project: {
             type: "string",
-            description: "Project directory name.",
+            description: "Project name",
           },
         },
         required: ["project"],
-        additionalProperties: false,
       },
     },
   },
@@ -49,17 +48,16 @@ export const aiTools = [
     type: "function",
     function: {
       name: "open_terminal",
-      description: "Open a terminal inside a development project.",
+      description: "Open a terminal in a developer project.",
       parameters: {
         type: "object",
         properties: {
           project: {
             type: "string",
-            description: "Project directory name.",
+            description: "Project name",
           },
         },
         required: ["project"],
-        additionalProperties: false,
       },
     },
   },
@@ -74,11 +72,10 @@ export const aiTools = [
         properties: {
           project: {
             type: "string",
-            description: "Project directory name.",
+            description: "Project name",
           },
         },
         required: ["project"],
-        additionalProperties: false,
       },
     },
   },
@@ -93,11 +90,10 @@ export const aiTools = [
         properties: {
           project: {
             type: "string",
-            description: "Project directory name.",
+            description: "Project name",
           },
         },
         required: ["project"],
-        additionalProperties: false,
       },
     },
   },
@@ -106,16 +102,16 @@ export const aiTools = [
     type: "function",
     function: {
       name: "get_git_status",
-      description: "Get Git status for a development project.",
+      description: "Get the Git status of a project.",
       parameters: {
         type: "object",
         properties: {
           project: {
             type: "string",
+            description: "Project name",
           },
         },
         required: ["project"],
-        additionalProperties: false,
       },
     },
   },
@@ -124,21 +120,20 @@ export const aiTools = [
     type: "function",
     function: {
       name: "get_git_log",
-      description: "Get recent Git commits for a development project.",
+      description: "Get recent Git commits for a project.",
       parameters: {
         type: "object",
         properties: {
           project: {
             type: "string",
+            description: "Project name",
           },
           limit: {
-            type: "integer",
-            minimum: 1,
-            maximum: 20,
+            type: "number",
+            description: "Number of commits",
           },
         },
         required: ["project"],
-        additionalProperties: false,
       },
     },
   },
@@ -147,16 +142,16 @@ export const aiTools = [
     type: "function",
     function: {
       name: "run_tests",
-      description: "Run the project's npm test command.",
+      description: "Run the project's test suite.",
       parameters: {
         type: "object",
         properties: {
           project: {
             type: "string",
+            description: "Project name",
           },
         },
         required: ["project"],
-        additionalProperties: false,
       },
     },
   },
@@ -165,11 +160,11 @@ export const aiTools = [
     type: "function",
     function: {
       name: "get_system_info",
-      description: "Get basic information about the user's computer.",
+      description: "Get information about the user's computer.",
       parameters: {
         type: "object",
         properties: {},
-        additionalProperties: false,
+        required: [],
       },
     },
   },
