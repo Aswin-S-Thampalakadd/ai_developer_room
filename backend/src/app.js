@@ -4,6 +4,8 @@ import cors from "cors";
 import config from "./config.js";
 import { desktopService } from "./modules/desktop/desktop.service.js";
 import aiRoutes from "./modules/ai/ai.routes.js";
+import memoryRoutes from "./modules/memory/memory.routes.js";
+import ragRoutes from "./modules/rag/rag.routes.js";
 
 const app = express();
 
@@ -11,6 +13,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/ai", aiRoutes);
+app.use("/api/memory", memoryRoutes);
+app.use("/api/rag", ragRoutes);
 
 app.get("/health", (req, res) => {
   res.json({

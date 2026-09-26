@@ -12,6 +12,8 @@ const config = {
   desktopAgentUrl: process.env.DESKTOP_AGENT_URL || "ws://localhost:5050",
 
   desktopAgentApiKey: process.env.DESKTOP_AGENT_API_KEY,
+
+  ollamaEmbeddingModel: "nomic-embed-text",
 };
 
 if (!config.desktopAgentApiKey) {
