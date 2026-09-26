@@ -26,17 +26,37 @@ export const aiTools = [
     },
   },
 
+  // {
+  //   type: "function",
+  //   function: {
+  //     name: "open_project",
+  //     description: "Open a developer project in VS Code.",
+  //     parameters: {
+  //       type: "object",
+  //       properties: {
+  //         project: {
+  //           type: "string",
+  //           description: "Project name",
+  //         },
+  //       },
+  //       required: ["project"],
+  //     },
+  //   },
+  // },
+
   {
     type: "function",
     function: {
       name: "open_project",
-      description: "Open a developer project in VS Code.",
+      description:
+        "Open a project in VS Code. The project argument must exactly match the project name provided by the user or returned by list_projects.",
       parameters: {
         type: "object",
         properties: {
           project: {
             type: "string",
-            description: "Project name",
+            description:
+              "Exact project directory name, for example used_car_sale_app",
           },
         },
         required: ["project"],
@@ -207,6 +227,28 @@ export const aiTools = [
           },
         },
         required: ["project"],
+      },
+    },
+  },
+
+  {
+    type: "function",
+    function: {
+      name: "investigate_error",
+      description:
+        "Investigate a development error using project code, project structure, Git status, and configuration.",
+      parameters: {
+        type: "object",
+        properties: {
+          project: {
+            type: "object",
+          },
+          error: {
+            type: "string",
+          },
+        },
+
+        required: ["project", "error"],
       },
     },
   },

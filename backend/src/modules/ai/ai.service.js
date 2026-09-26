@@ -2,6 +2,9 @@ import ollama from "ollama";
 import config from "../../config.js";
 import { desktopService } from "../desktop/desktop.service.js";
 import { aiTools } from "./ai.tools.js";
+import { investigateError } from "./error.service.js";
+import { systemMessage } from "../../utils/messages.js";
+import { retrieveProjectContext } from "../rag/rag.service.js";
 
 const SYSTEM_PROMPT = `
 You are AI Developer Room Assistant.
@@ -63,22 +66,67 @@ const executeTool = async (name, args) => {
     case "analyze_project":
       return await desktopService.call("analyze_project", args);
 
+    case "investigate_error":
+      return investigateError(args.project, args.error);
+
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
 };
 
-export const chatWithAI = async (message) => {
-  const messages = [
+const getProjectContext = async (message, project) => {
+  if (!project) {
+    return "";
+  }
+
+  const results = await retrieveProjectContext(project, message, 6);
+
+  return results
+    .map((result) => `FILE: ${result.filePath}\n${result.content}`)
+    .join("\n\n");
+};
+
+export const chatWithAI = async (message, project = null) => {
+  let messages = [
     {
       role: "system",
-      content: SYSTEM_PROMPT,
+      content: systemMessage,
     },
     {
       role: "user",
       content: message,
     },
   ];
+
+  if (project) {
+    messages = [
+      {
+        role: "system",
+        content: systemMessage,
+      },
+      {
+        role: "system",
+        content: `
+The user has selected the following project:
+
+${project}
+
+This is the exact project name.
+
+For any project-related tool call, use this exact project name:
+${project}
+
+Do not ask the user for the project name again.
+Do not call list_projects to determine the project.
+Do not modify, normalize, replace, or reformat the project name.
+        `,
+      },
+      {
+        role: "user",
+        content: message,
+      },
+    ];
+  }
 
   for (let iteration = 0; iteration < 5; iteration++) {
     const response = await ollama.chat({
@@ -91,6 +139,9 @@ export const chatWithAI = async (message) => {
 
     const assistantMessage = response.message;
 
+    console.log("AI MESSAGE:", assistantMessage);
+    console.log("TOOL CALLS:", assistantMessage.tool_calls);
+
     messages.push(assistantMessage);
 
     if (
@@ -102,11 +153,15 @@ export const chatWithAI = async (message) => {
 
     for (const toolCall of assistantMessage.tool_calls) {
       const toolName = toolCall.function.name;
-
       const toolArgs = toolCall.function.arguments || {};
+
+      console.log("TOOL NAME:", toolName);
+      console.log("TOOL ARGS:", toolArgs);
 
       try {
         const result = await executeTool(toolName, toolArgs);
+
+        console.log("TOOL RESULT:", result);
 
         messages.push({
           role: "tool",
@@ -114,6 +169,8 @@ export const chatWithAI = async (message) => {
           content: JSON.stringify(result),
         });
       } catch (error) {
+        console.error("TOOL ERROR:", error);
+
         messages.push({
           role: "tool",
           tool_name: toolName,
@@ -128,3 +185,84 @@ export const chatWithAI = async (message) => {
 
   throw new Error("Maximum tool execution iterations reached");
 };
+
+// export const chatWithAI = async (message, project = null) => {
+//   let messages = [
+//     {
+//       role: "system",
+//       content: systemMessage,
+//     },
+//     {
+//       role: "user",
+//       content: message,
+//     },
+//   ];
+//   let projectContext = null;
+
+//   if (project) {
+//     projectContext = await getProjectContext(message, project);
+//     messages = [
+//       systemMessage,
+//       {
+//         role: "system",
+//         content: `
+//     Relevant project context:
+
+//     ${projectContext}
+//     `,
+//       },
+//       {
+//         role: "user",
+//         content: message,
+//       },
+//     ];
+//   }
+
+//   for (let iteration = 0; iteration < 5; iteration++) {
+//     const response = await ollama.chat({
+//       host: config.ollamaHost,
+//       model: config.ollamaModel,
+//       messages,
+//       tools: aiTools,
+//       stream: false,
+//     });
+
+//     const assistantMessage = response.message;
+
+//     messages.push(assistantMessage);
+
+//     if (
+//       !assistantMessage.tool_calls ||
+//       assistantMessage.tool_calls.length === 0
+//     ) {
+//       return assistantMessage.content;
+//     }
+
+//     for (const toolCall of assistantMessage.tool_calls) {
+//       const toolName = toolCall.function.name;
+
+//       const toolArgs = toolCall.function.arguments || {};
+
+//       try {
+//         const result = await executeTool(toolName, toolArgs);
+
+//         messages.push({
+//           role: "tool",
+//           tool_name: toolName,
+//           content: JSON.stringify(result),
+//         });
+//       } catch (error) {
+//         messages.push({
+//           role: "tool",
+//           tool_name: toolName,
+//           content: JSON.stringify({
+//             success: false,
+//             error: error.message,
+//           }),
+//         });
+//       }
+//     }
+//   }
+
+//   throw new Error("Maximum tool execution iterations reached");
+// };

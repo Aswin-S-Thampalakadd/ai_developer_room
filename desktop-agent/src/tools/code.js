@@ -105,3 +105,53 @@ export const searchCode = async (project, searchTerm) => {
     results: results.slice(0, 100),
   };
 };
+
+export const getProjectDocuments = async (project) => {
+  const projectPath = getProjectPath(project);
+
+  const documents = [];
+
+  const collect = async (directory) => {
+    const entries = await fs.readdir(directory, {
+      withFileTypes: true,
+    });
+
+    for (const entry of entries) {
+      if (entry.isDirectory() && ignoredDirectories.has(entry.name)) {
+        continue;
+      }
+
+      const fullPath = path.join(directory, entry.name);
+
+      if (entry.isDirectory()) {
+        await collect(fullPath);
+        continue;
+      }
+
+      const extension = path.extname(entry.name);
+
+      if (!allowedExtensions.has(extension)) {
+        continue;
+      }
+
+      try {
+        const content = await fs.readFile(fullPath, "utf8");
+
+        if (content.length > 100000) {
+          continue;
+        }
+
+        documents.push({
+          filePath: path.relative(projectPath, fullPath),
+          content,
+        });
+      } catch (error) {}
+    }
+  };
+  await collect(projectPath);
+
+  return {
+    project,
+    documents,
+  };
+};
