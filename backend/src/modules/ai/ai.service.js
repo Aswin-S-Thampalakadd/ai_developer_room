@@ -2,6 +2,8 @@ import ollama from "ollama";
 import config from "../../config.js";
 import { desktopService } from "../desktop/desktop.service.js";
 import { aiTools } from "./ai.tools.js";
+import { investigateError } from "./error.service.js";
+import { systemMessage } from "../../utils/messages.js";
 
 const SYSTEM_PROMPT = `
 You are AI Developer Room Assistant.
@@ -63,6 +65,9 @@ const executeTool = async (name, args) => {
     case "analyze_project":
       return await desktopService.call("analyze_project", args);
 
+    case "investigate_error":
+      return investigateError(args.project, args.error);
+
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
@@ -72,7 +77,7 @@ export const chatWithAI = async (message) => {
   const messages = [
     {
       role: "system",
-      content: SYSTEM_PROMPT,
+      content: systemMessage,
     },
     {
       role: "user",

@@ -210,4 +210,26 @@ export const aiTools = [
       },
     },
   },
+
+  {
+    type: "function",
+    function: {
+      name: "investigate_error",
+      description:
+        "Investigate a development error using project code, project structure, Git status, and configuration.",
+      parameters: {
+        type: "object",
+        properties: {
+          project: {
+            type: "object",
+          },
+          error: {
+            type: "string",
+          },
+        },
+
+        required: ["project", "error"],
+      },
+    },
+  },
 ];
